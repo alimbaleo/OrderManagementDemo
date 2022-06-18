@@ -15,29 +15,31 @@ password : ''
 isLoggedIn = false;
   isLoginFailed = false;
   errorMessage = '';
-  role: string = '';
 
   constructor(private authService: AuthService, private sessionService: SessionService) { }
 
   ngOnInit() {
     if (this.sessionService.getAuthToken()) {
       this.isLoggedIn = true;
-      this.role = this.sessionService.getUser()?.role ?? '';
+      //this.role = this.sessionService.getUser()?.role ?? '';
     }
   }
 
   onSubmit(): void {
     this.authService.login(this.form.email, this.form.password).subscribe(
       data => {
-        this.sessionService.saveAuthToken(data.accessToken);
+        console.log(data);
+        data = data.data;
+        this.sessionService.saveAuthToken(data.token, data.expiration);
         this.sessionService.saveUser(data);
         this.isLoginFailed = false;
         this.isLoggedIn = true;
-        this.role = this.sessionService.getUser()?.role ?? '';
+        //this.role = this.sessionService.getUser()?.role ?? '';
         this.reloadPage();
       },
       err => {
-        this.errorMessage = err.error.message;
+        console.log(err);
+        this.errorMessage = err.error.errorMessage;
         this.isLoginFailed = true;
       }
     );
